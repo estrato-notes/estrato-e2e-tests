@@ -1,0 +1,87 @@
+{
+  "global_config": {
+    "typing_speed": 0.1,
+    "default_wait_time": 1.5
+  },
+  "user": {
+    "full_name": "Henrique da Silva",
+    "email": "henrique.silva@email.com",
+    "password": "SenhaForte123",
+    "new_full_name": "Henrique Costa",
+    "new_password": "NovaSenhaForte456",
+    "delete_account_at_end": true
+  },
+  "notebooks": {
+    "projects": {
+      "name": "Projetos Pessoais",
+      "new_name": "Projetos Pessoais ESW",
+      "should_favorite": true
+    },
+    "college": {
+      "name": "Faculdade"
+    },
+    "deletion": {
+      "name": "Caderno Temporário",
+      "description": "Será criado apenas para ser excluído"
+    }
+  },
+  "notes": {
+    "complete_note": {
+      "title": "Planejamento do Trabalho",
+      "content": "# Introdução\nO projeto visa automatizar testes.\n---\n## Seção 1\nO código de execução é: `pip freeze > requirements.txt`",
+      "tag_association": "Urgente",
+      "should_favorite": true
+    },
+    "edit_note": {
+      "new_title": "Planejamento do Trabalho (Revisado)",
+      "new_content": "\n\n## Conclusão\nTestes automatizados com sucesso."
+    },
+    "quick_capture": {
+      "content": "Lembrar de estudar para o teste surpresa.",
+      "expected_title_start": "Lembrar de estudar"
+    },
+    "move_note": {
+      "title": "Ideia Aleatória",
+      "content": "Mover esta nota para o caderno de Faculdade depois."
+    },
+    "delete_note": {
+      "title": "Nota de Rascunho",
+      "content": "Esta nota será apagada durante o teste."
+    },
+    "template_origin_note": {
+      "title": "Estrutura Padrão de Relatório",
+      "content": "**Data:**\n**Assunto:**\n**Ações:**"
+    }
+  },
+  "templates": {
+    "meeting_template": {
+      "name": "Ata de Reunião",
+      "content": "### Data:\n\n### Participantes:\n- \n\n### Pautas:\n1. "
+    },
+    "edit_template": {
+      "new_name": "Ata de Reunião (Oficial)",
+      "new_content": "\n### Decisões:"
+    },
+    "from_note_template": {
+      "name": "Template via Nota"
+    },
+    "generated_note": {
+      "title": "Reunião de Orientação"
+    }
+  },
+  "tags": {
+    "urgent": {
+      "name": "Urgente",
+      "new_name": "Prioridade Alta"
+    },
+    "study": {
+      "name": "Estudos"
+    },
+    "deletion": {
+      "name": "Depreciada"
+    }
+  },
+  "search": {
+    "term": "execução"
+  }
+}
