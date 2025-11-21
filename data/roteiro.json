@@ -28,7 +28,7 @@
   "notes": {
     "complete_note": {
       "title": "Planejamento do Trabalho",
-      "content": "# Introdução\nO projeto visa automatizar testes.\n---\n## Seção 1\nO código de execução é: `pip freeze > requirements.txt`",
+      "content": "# Como Rodar\nPara rodar o projeto, execute os seguintes passos.\n\n---\n\n## Passo 1\nO código de execução é: `pnpm dev`",
       "tag_association": "Urgente",
       "should_favorite": true
     },

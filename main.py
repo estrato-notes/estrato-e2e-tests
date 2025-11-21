@@ -3,7 +3,7 @@ import time
 
 from selenium import webdriver
 
-from src.actions import dashboard, notebooks, users
+from src.actions import dashboard, notebooks, notes, templates, users
 
 
 def setup_driver():
@@ -29,10 +29,16 @@ if __name__ == "__main__":
         users.execute_register(driver, data)
         users.logout(driver)
         users.login(driver, data)
-
         dashboard.create_quick_note(driver, data)
-
         notebooks.execute_notebook_flow(driver, data)
+        notes.create_complete_note(driver, data)
+        templates.create_template_from_scratch(driver, data)
+        notes.create_note_from_template(driver, data)
+        templates.create_template_from_existing_note(driver, data)
+        notes.edit_existing_note(driver, data)
+        notes.move_note(driver, data)
+        notes.favorite_note(driver, data)
+        dashboard.verify_dashboard(driver)
 
         time.sleep(3)
 
