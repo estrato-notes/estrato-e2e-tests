@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.common.by import By
 
 from src.config import BASE_URL
@@ -8,6 +10,7 @@ def go_to_notes(driver):
     if "/notes" not in driver.current_url:
         driver.get(f"{BASE_URL}/notes")
         wait()
+        time.sleep(3)
 
 
 def get_notebook_row(driver, notebook_name):
@@ -28,6 +31,7 @@ def open_notebook_menu(driver, notebook_name):
 
 
 def create_notebook(driver, notebook_name):
+    wait()
     go_to_notes(driver)
 
     driver.find_element(By.XPATH, "//button[contains(., 'Novo Caderno')]").click()
@@ -106,6 +110,7 @@ def execute_notebook_flow(driver, data):
 
     for notebook_data in notebooks.values():
         create_notebook(driver, notebook_data["name"])
+        wait()
 
         if notebook_data.get("should_favorite"):
             toggle_favorite_notebook(driver, notebook_data["name"])

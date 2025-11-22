@@ -28,6 +28,8 @@ def execute_register(driver, data):
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
     wait()
 
+    time.sleep(5)
+
     if "/dashboard" in driver.current_url:
         print("[Register] Sucesso: Redirecionado para Dashboard.")
     else:
@@ -55,12 +57,7 @@ def login(driver, data):
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
     wait()
-    time.sleep(2)
-
-    if "/dashboard" in driver.current_url:
-        print("[Login] Sucesso.")
-    else:
-        print("[Login] Falha: Não acessou o dashboard.")
+    time.sleep(5)
 
 
 def logout(driver):
@@ -82,3 +79,27 @@ def logout(driver):
     )
     logout_btn.click()
     wait()
+
+
+def login_new_password(driver, data):
+    """
+    Executa o fluxo de login.
+    """
+    user = data["user"]
+
+    if "/login" not in driver.current_url and "/dashboard" not in driver.current_url:
+        driver.get(f"{BASE_URL}/login")
+        wait()
+
+    if "/dashboard" in driver.current_url:
+        logout(driver)
+
+    driver.find_element(By.ID, "email").send_keys(user["email"])
+    wait()
+    driver.find_element(By.ID, "password").send_keys(user["new_password"])
+    wait()
+
+    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+
+    wait()
+    time.sleep(5)

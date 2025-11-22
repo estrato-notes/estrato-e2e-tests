@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.common.by import By
 
 from src.config import BASE_URL
@@ -8,6 +10,7 @@ def go_to_dashboard(driver):
     if "/dashboard" not in driver.current_url:
         driver.get(f"{BASE_URL}/dashboard")
         wait()
+        time.sleep(3)
 
 
 def create_quick_note(driver, data):
@@ -20,6 +23,7 @@ def create_quick_note(driver, data):
         By.XPATH, "//textarea[@placeholder='Digite sua nota rápida aqui...']"
     )
     slow_type(textarea, content)
+    wait()
     wait()
 
     save_btn = driver.find_element(By.XPATH, "//button[contains(., 'Salvar')]")

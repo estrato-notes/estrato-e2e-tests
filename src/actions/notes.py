@@ -219,8 +219,6 @@ def move_note(driver, data):
     except Exception as e:
         print(f"[Notes] Erro ao selecionar destino no menu: {e}")
         return
-
-    driver.refresh()
     wait()
 
 
@@ -249,3 +247,56 @@ def favorite_note(driver, data):
         time.sleep(1)
     except Exception as e:
         print(f"[Notes] Erro ao clicar na estrela de favorito: {e}")
+
+
+def delete_draft_note(driver, data):
+    note_data = data["notes"]["delete_note"]
+
+    go_to_notes(driver)
+
+    try:
+        driver.find_element(By.XPATH, "//button[contains(., 'Nova Nota')]").click()
+        wait()
+
+        driver.find_element(
+            By.XPATH, "//div[contains(text(), 'Criar nota do zero')]"
+        ).click()
+        wait()
+
+        title_input = driver.find_element(
+            By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]"
+        )
+        title_input.clear()
+        title_input.send_keys(note_data["title"])
+        wait()
+
+        content_area = driver.find_element(
+            By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']"
+        )
+        slow_type(content_area, note_data["content"])
+        wait()
+
+        driver.find_element(By.XPATH, "//button[contains(., 'Salvar')]").click()
+        wait()
+    except Exception as e:
+        print(f"[Notes] Erro na preparação (criação da nota): {e}")
+        return
+
+    try:
+        driver.find_element(
+            By.XPATH, f"//div[h3[text()='{note_data['title']}']]//button"
+        ).click()
+        wait()
+
+        driver.find_element(
+            By.XPATH, "//div[@role='menuitem'][contains(., 'Apagar Nota')]"
+        ).click()
+        wait()
+
+        driver.find_element(
+            By.XPATH,
+            "//button[contains(@class, 'bg-destructive') and contains(., 'Apagar')]",
+        ).click()
+        wait()
+    except Exception as e:
+        print(f"[Notes] Erro durante a exclusão: {e}")

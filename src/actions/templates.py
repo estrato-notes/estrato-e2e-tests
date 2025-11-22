@@ -1,3 +1,5 @@
+import time
+
 from selenium.webdriver.common.by import By
 
 from src.config import BASE_URL
@@ -8,6 +10,7 @@ def go_to_template(driver):
     if "/templates" not in driver.current_url:
         driver.get(f"{BASE_URL}/templates")
         wait()
+        time.sleep(3)
 
 
 def create_template_from_scratch(driver, data):

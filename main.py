@@ -3,7 +3,16 @@ import time
 
 from selenium import webdriver
 
-from src.actions import dashboard, notebooks, notes, templates, users
+from src.actions import (
+    dashboard,
+    notebooks,
+    notes,
+    profile,
+    search,
+    tags,
+    templates,
+    users,
+)
 
 
 def setup_driver():
@@ -39,7 +48,20 @@ if __name__ == "__main__":
         notes.move_note(driver, data)
         notes.favorite_note(driver, data)
         dashboard.verify_dashboard(driver)
-
+        notes.delete_draft_note(driver, data)
+        tags.add_tags_to_active_note(driver, data)
+        tags.create_tag_via_dedicated_page(driver, data)
+        tags.rename_tag(driver, data)
+        dashboard.verify_dashboard(driver)
+        tags.delete_tag(driver, data)
+        dashboard.verify_dashboard(driver)
+        search.perform_global_search(driver, data)
+        dashboard.go_to_dashboard(driver)
+        profile.update_name(driver, data)
+        profile.change_password(driver, data)
+        users.logout(driver)
+        users.login_new_password(driver, data)
+        profile.delete_account(driver)
         time.sleep(3)
 
     except Exception as e:
