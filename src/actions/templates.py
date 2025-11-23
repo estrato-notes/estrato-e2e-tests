@@ -29,7 +29,7 @@ def create_template_from_scratch(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//button[contains(., 'Novo Template')]")
         ).click()
-        wait(1)  # Espera animação do modal
+        wait(1)
     except Exception as e:
         print(f"[Templates] Erro ao clicar em 'Novo Template': {e}")
         return
@@ -60,7 +60,7 @@ def create_template_from_scratch(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//button[contains(., 'Salvar')]")
         ).click()
-        wait_for_overlay_gone(driver)  # Espera modal fechar
+        wait_for_overlay_gone(driver)
         wait(1)
         print(f"[Templates] Template '{template_name}' salvo.")
     except Exception as e:
@@ -116,7 +116,7 @@ def create_template_from_existing_note(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//div[contains(text(), 'Criar Template desta Nota')]")
         ).click()
-        wait(1)  # Espera modal abrir
+        wait(1)
     except Exception as e:
         print(f"[Templates] Erro ao clicar na opção do menu: {e}")
         return
@@ -130,7 +130,7 @@ def create_template_from_existing_note(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//button[contains(text(), 'Criar Template')]")
         ).click()
-        wait_for_overlay_gone(driver)  # Espera modal fechar
+        wait_for_overlay_gone(driver)
         wait(1)
     except Exception as e:
         print(f"[Templates] Erro no modal de criação de template: {e}")

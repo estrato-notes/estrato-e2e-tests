@@ -20,7 +20,6 @@ def go_to_tags(driver):
 
 
 def add_tags_to_active_note(driver, data):
-    # Refresh para limpar estado de modais anteriores
     driver.refresh()
     wait(2)
 
@@ -41,7 +40,7 @@ def add_tags_to_active_note(driver, data):
         )
         tag_input.send_keys(tag_name)
         tag_input.send_keys(Keys.ENTER)
-        wait(1)  # Espera a tag ser criada e aparecer na lista
+        wait(1)
 
         wait_for_element(driver, (By.XPATH, f"//span[contains(text(), '{tag_name}')]"))
 
@@ -82,7 +81,7 @@ def rename_tag(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, f"{tag_row_xpath}//button[contains(., 'Editar')]")
         ).click()
-        wait(1)  # Espera modal abrir
+        wait(1)
 
         input_elem = wait_for_element(driver, (By.ID, "edit-tag"))
         input_elem.clear()
@@ -92,7 +91,7 @@ def rename_tag(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//button[contains(., 'Salvar')]")
         ).click()
-        wait_for_overlay_gone(driver)  # Espera modal fechar
+        wait_for_overlay_gone(driver)
         wait(1)
     except Exception as e:
         print(f"[Tags] Erro ao renomear tag: {e}")
@@ -108,7 +107,7 @@ def delete_tag(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, f"{tag_row_xpath}//button[contains(., 'Apagar')]")
         ).click()
-        wait(1)  # Espera modal de confirmação
+        wait(1)
 
         wait_for_clickable(
             driver,

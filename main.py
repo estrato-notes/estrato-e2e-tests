@@ -134,9 +134,5 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"Erro Crítico na execução: {e}")
-        try:
-            print("Screenshot salvo como 'erro_execucao.png'")
-        except Exception:
-            pass
     finally:
         driver.quit()

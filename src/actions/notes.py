@@ -35,7 +35,7 @@ def create_complete_note(driver, data):
             ),
         )
         notebook_btn.click()
-        wait(1)  # Espera carregar notas do caderno
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao selecionar caderno {notebook_name}: {e}")
         return
@@ -48,7 +48,7 @@ def create_complete_note(driver, data):
                 "//div[contains(@class, 'lg:col-span-4')]//button[contains(., 'Nova Nota')]",
             ),
         ).click()
-        wait(1)  # Espera animação de abertura
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro crítico: Botão 'Nova Nota' da lista não encontrado. {e}")
         return
@@ -67,7 +67,7 @@ def create_complete_note(driver, data):
     wait(0.5)
 
     wait_for_clickable(driver, (By.XPATH, "//button[contains(., 'Salvar')]")).click()
-    wait(1)  # Espera o salvamento
+    wait(1)
 
     tag_name = note_data["tag_association"]
 
@@ -90,7 +90,7 @@ def create_complete_note(driver, data):
         print(f"[Notes] Erro ao tentar visualizar a nota: {e}")
 
     driver.refresh()
-    wait(3)  # Espera refresh completo
+    wait(3)
 
 
 def create_note_from_template(driver, data):
@@ -121,7 +121,6 @@ def create_note_from_template(driver, data):
             driver, (By.XPATH, f"//button[.//h3[contains(text(), '{template_name}')]]")
         ).click()
 
-        # CRUCIAL: Espera o modal fechar e o overlay sumir
         wait_for_overlay_gone(driver)
         wait(1)
 
@@ -244,7 +243,6 @@ def move_note(driver, data):
             (By.XPATH, f"//div[@role='menuitem'][contains(., '{target_notebook}')]"),
         ).click()
 
-        # Espera o modal fechar e o item sumir da lista atual
         wait_for_overlay_gone(driver)
         wait(1)
 
@@ -330,7 +328,7 @@ def delete_draft_note(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//div[@role='menuitem'][contains(., 'Apagar Nota')]")
         ).click()
-        wait(1)  # Espera modal de confirmação
+        wait(1)
 
         wait_for_clickable(
             driver,

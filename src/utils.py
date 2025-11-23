@@ -18,17 +18,14 @@ def wait_for_overlay_gone(driver, timeout=10):
     Essencial para evitar ElementClickInterceptedException.
     """
     try:
-        # Seletor genérico para overlays do Radix UI / Shadcn (fundo fixo)
         overlay_xpath = (
             "//div[contains(@data-state, 'open') and contains(@class, 'fixed inset-0')]"
         )
         WebDriverWait(driver, timeout).until(
             EC.invisibility_of_element_located((By.XPATH, overlay_xpath))
         )
-        # Pausa de segurança pós-animação
         time.sleep(0.5)
     except (TimeoutException, NoSuchElementException):
-        # Se não tiver overlay ou já tiver sumido, segue o fluxo
         pass
 
 
@@ -44,13 +41,10 @@ def wait_for_clickable(driver, locator, timeout=30):
     """
     Espera o elemento ser clicável E garante que não há overlays bloqueando.
     """
-    # 1. Garante que modais anteriores fecharam
     wait_for_overlay_gone(driver)
 
-    # 2. Espera o elemento estar clicável
     element = WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 
-    # 3. Pausa tática para evitar cliques durante micro-animações de hover/focus
     time.sleep(0.5)
     return element
 

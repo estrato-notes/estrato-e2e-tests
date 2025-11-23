@@ -32,12 +32,11 @@ def create_quick_note(driver, data):
     wait(1)
 
     wait_for_clickable(driver, (By.XPATH, "//button[contains(., 'Salvar')]")).click()
-    wait(2)  # Espera salvar e a lista atualizar
+    wait(2)
 
     expected_start = note_data.get("expected_title_start", content[:10])
 
     try:
-        # Verifica se apareceu na lista
         wait_for_element(
             driver, (By.XPATH, f"//div[h3[contains(., '{expected_start}')]]")
         )

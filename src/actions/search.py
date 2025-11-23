@@ -21,7 +21,7 @@ def perform_global_search(driver, data):
         )
         search_input.clear()
         slow_type(search_input, search_term)
-        wait(2)  # Espera o debounce da busca
+        wait(2)
 
         result_xpath = f"//span[contains(text(), '{expected_title_note}')]"
 

@@ -28,16 +28,13 @@ def get_notebook_row(driver, notebook_name):
 
 
 def open_notebook_menu(driver, notebook_name):
-    # Garante que a linha está visível
     notebook_row = get_notebook_row(driver, notebook_name)
 
-    # Encontra o botão dentro da linha (último botão geralmente é o menu)
     menu_btn = notebook_row.find_element(By.XPATH, ".//button[last()]")
 
-    # Pausa breve para garantir interatividade
     wait(0.5)
     menu_btn.click()
-    wait(1)  # Espera o menu abrir
+    wait(1)
 
 
 def create_notebook(driver, notebook_name):
@@ -46,7 +43,7 @@ def create_notebook(driver, notebook_name):
     wait_for_clickable(
         driver, (By.XPATH, "//button[contains(., 'Novo Caderno')]")
     ).click()
-    wait(1)  # Espera modal abrir
+    wait(1)
 
     name_input = wait_for_element(driver, (By.ID, "notebook-name"))
     name_input.clear()
@@ -55,7 +52,7 @@ def create_notebook(driver, notebook_name):
 
     driver.find_element(By.XPATH, "//button[contains(text(), 'Criar')]").click()
 
-    wait_for_overlay_gone(driver)  # Espera modal fechar
+    wait_for_overlay_gone(driver)
     print(f"[Notebooks] Caderno '{notebook_name}' criado.")
 
 
@@ -68,7 +65,7 @@ def rename_notebook(driver, old_name, new_name):
         wait_for_clickable(
             driver, (By.XPATH, "//div[@role='menuitem'][contains(., 'Renomear')]")
         ).click()
-        wait(1)  # Espera modal abrir
+        wait(1)
 
         rename_input = wait_for_element(driver, (By.ID, "rename-notebook"))
         rename_input.clear()
@@ -77,7 +74,7 @@ def rename_notebook(driver, old_name, new_name):
 
         driver.find_element(By.XPATH, "//button[contains(text(), 'Renomear')]").click()
 
-        wait_for_overlay_gone(driver)  # Espera modal fechar
+        wait_for_overlay_gone(driver)
 
     except Exception as e:
         print(f"[Notebooks] Erro ao renomear: {e}")
@@ -90,7 +87,7 @@ def toggle_favorite_notebook(driver, notebook_name):
         notebook_row = get_notebook_row(driver, notebook_name)
         star_btn = notebook_row.find_element(By.XPATH, ".//button[1]")
         star_btn.click()
-        wait(1)  # Espera atualização da UI
+        wait(1)
     except Exception as e:
         print(f"[Notebooks] Erro ao favoritar: {e}")
 
@@ -104,7 +101,7 @@ def delete_notebook(driver, notebook_name):
         wait_for_clickable(
             driver, (By.XPATH, "//div[@role='menuitem'][contains(., 'Apagar Caderno')]")
         ).click()
-        wait(1)  # Espera modal de confirmação
+        wait(1)
 
         wait_for_clickable(
             driver,
@@ -114,7 +111,7 @@ def delete_notebook(driver, notebook_name):
             ),
         ).click()
 
-        wait_for_overlay_gone(driver)  # Espera modal fechar e item sumir
+        wait_for_overlay_gone(driver)
 
     except Exception as e:
         print(f"[Notebooks] Erro ao excluir: {e}")

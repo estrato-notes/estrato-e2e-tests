@@ -45,7 +45,7 @@ def update_name(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//button[contains(text(), 'Salvar')]")
         ).click()
-        wait(2)  # Espera salvar
+        wait(2)
 
     except Exception as e:
         print(f"[Profile] Erro ao atualizar nome: {e}")
