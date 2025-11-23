@@ -297,7 +297,7 @@ def delete_draft_note(driver, data):
         wait_for_clickable(
             driver, (By.XPATH, "//div[contains(text(), 'Criar nota do zero')]")
         ).click()
-        wait(1)
+        wait(3)
 
         title_input = wait_for_element(
             driver, (By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]")
