@@ -1,16 +1,22 @@
-import time
-
 from selenium.webdriver.common.by import By
 
 from src.config import BASE_URL
-from src.utils import slow_type, wait
+from src.utils import (
+    slow_type,
+    wait,
+    wait_for_clickable,
+    wait_for_element,
+    wait_for_overlay_gone,
+    wait_for_url_contains,
+)
 
 
 def go_to_dashboard(driver):
+    wait_for_overlay_gone(driver)
     if "/dashboard" not in driver.current_url:
         driver.get(f"{BASE_URL}/dashboard")
+        wait_for_url_contains(driver, "/dashboard")
         wait()
-        time.sleep(3)
 
 
 def create_quick_note(driver, data):
@@ -19,31 +25,30 @@ def create_quick_note(driver, data):
 
     go_to_dashboard(driver)
 
-    textarea = driver.find_element(
-        By.XPATH, "//textarea[@placeholder='Digite sua nota rápida aqui...']"
+    textarea = wait_for_element(
+        driver, (By.XPATH, "//textarea[@placeholder='Digite sua nota rápida aqui...']")
     )
     slow_type(textarea, content)
-    wait()
-    wait()
+    wait(1)
 
-    save_btn = driver.find_element(By.XPATH, "//button[contains(., 'Salvar')]")
-    save_btn.click()
-    wait()
+    wait_for_clickable(driver, (By.XPATH, "//button[contains(., 'Salvar')]")).click()
+    wait(2)  # Espera salvar e a lista atualizar
 
     expected_start = note_data.get("expected_title_start", content[:10])
-    recent_notes = driver.find_elements(
-        By.XPATH, "//div[h3[contains(., '" + expected_start + "')]]"
-    )
 
-    if len(recent_notes) > 0:
+    try:
+        # Verifica se apareceu na lista
+        wait_for_element(
+            driver, (By.XPATH, f"//div[h3[contains(., '{expected_start}')]]")
+        )
         print("[Dashboard] Sucesso: Nota rápida encontrada na lista recente.")
-    else:
-        print("[Dashboard] Erro: Nota rápida não apareceu na lista.")
+    except Exception as e:
+        print(f"[Dashboard] Erro: Nota rápida não apareceu na lista: {e}")
 
 
 def verify_dashboard(driver):
     go_to_dashboard(driver)
-    wait()
 
+    wait_for_element(driver, (By.XPATH, "//div[contains(@class, 'grid')]"))
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight / 2);")
-    wait()
+    wait(2)

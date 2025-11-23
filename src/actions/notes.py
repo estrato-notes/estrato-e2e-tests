@@ -1,15 +1,22 @@
-import time
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from src.config import BASE_URL
-from src.utils import slow_type, wait
+from src.utils import (
+    slow_type,
+    wait,
+    wait_for_clickable,
+    wait_for_element,
+    wait_for_overlay_gone,
+    wait_for_url_contains,
+)
 
 
 def go_to_notes(driver):
+    wait_for_overlay_gone(driver)
     if "/notes" not in driver.current_url:
         driver.get(f"{BASE_URL}/notes")
+        wait_for_url_contains(driver, "/notes")
         wait()
 
 
@@ -20,62 +27,70 @@ def create_complete_note(driver, data):
     go_to_notes(driver)
 
     try:
-        notebook_btn = driver.find_element(
-            By.XPATH,
-            f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{notebook_name}']]",
+        notebook_btn = wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{notebook_name}']]",
+            ),
         )
         notebook_btn.click()
-        wait()
+        wait(1)  # Espera carregar notas do caderno
     except Exception as e:
         print(f"[Notes] Erro ao selecionar caderno {notebook_name}: {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH,
-            "//div[contains(@class, 'lg:col-span-4')]//button[contains(., 'Nova Nota')]",
+        wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                "//div[contains(@class, 'lg:col-span-4')]//button[contains(., 'Nova Nota')]",
+            ),
         ).click()
-        wait()
+        wait(1)  # Espera animação de abertura
     except Exception as e:
         print(f"[Notes] Erro crítico: Botão 'Nova Nota' da lista não encontrado. {e}")
         return
 
-    title_input = driver.find_element(
-        By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]"
+    title_input = wait_for_element(
+        driver, (By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]")
     )
     title_input.clear()
     title_input.send_keys(note_data["title"])
-    wait()
+    wait(0.5)
 
-    content_area = driver.find_element(
-        By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']"
+    content_area = wait_for_element(
+        driver, (By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']")
     )
-
     slow_type(content_area, note_data["content"])
-    wait()
+    wait(0.5)
 
-    save_btn = driver.find_element(By.XPATH, "//button[contains(., 'Salvar')]")
-    save_btn.click()
-    wait()
+    wait_for_clickable(driver, (By.XPATH, "//button[contains(., 'Salvar')]")).click()
+    wait(1)  # Espera o salvamento
 
     tag_name = note_data["tag_association"]
 
     try:
-        tag_input = driver.find_element(By.XPATH, "//input[@placeholder='nova tag']")
+        tag_input = wait_for_element(
+            driver, (By.XPATH, "//input[@placeholder='nova tag']")
+        )
         tag_input.send_keys(tag_name)
         tag_input.send_keys(Keys.ENTER)
-        wait()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao adicionar tag: {e}")
 
     try:
-        driver.find_element(By.XPATH, "//button[contains(., 'Visualizar')]").click()
-        wait()
+        wait_for_clickable(
+            driver, (By.XPATH, "//button[contains(., 'Visualizar')]")
+        ).click()
+        wait(2)
     except Exception as e:
         print(f"[Notes] Erro ao tentar visualizar a nota: {e}")
 
     driver.refresh()
-    wait()
+    wait(3)  # Espera refresh completo
 
 
 def create_note_from_template(driver, data):
@@ -84,49 +99,53 @@ def create_note_from_template(driver, data):
     go_to_notes(driver)
 
     try:
-        driver.find_element(
-            By.XPATH, "//header//button[contains(., 'Nova Nota')]"
+        wait_for_clickable(
+            driver, (By.XPATH, "//header//button[contains(., 'Nova Nota')]")
         ).click()
-        wait()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao abrir modal global: {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH, "//div[contains(text(), 'Criar a partir de template')]"
+        wait_for_clickable(
+            driver, (By.XPATH, "//div[contains(text(), 'Criar a partir de template')]")
         ).click()
-        wait()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao clicar na opção de template: {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH, f"//button[.//h3[contains(text(), '{template_name}')]]"
+        wait_for_clickable(
+            driver, (By.XPATH, f"//button[.//h3[contains(text(), '{template_name}')]]")
         ).click()
-        wait()
+
+        # CRUCIAL: Espera o modal fechar e o overlay sumir
+        wait_for_overlay_gone(driver)
+        wait(1)
+
     except Exception as e:
         print(f"[Notes] Erro ao selecionar o template na lista: {e}")
         return
 
     try:
-        title_input = driver.find_element(
-            By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]"
+        title_input = wait_for_element(
+            driver, (By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]")
         )
         current_title = title_input.get_attribute("value")
 
         if template_name in current_title:
             print(
-                f"[Notes] Sucesso: Nota criada a partir do template. Título atual: '{current_title}'"
+                f"[Notes] Sucesso: Nota criada via template. Título: '{current_title}'"
             )
         else:
             print(
-                f"[Notes] Aviso: Nota criada, mas o título '{current_title}' é diferente do template '{template_name}'."
+                f"[Notes] Aviso: Título '{current_title}' difere do template '{template_name}'."
             )
 
     except Exception as e:
-        print(f"[Notes] Erro na validação final (Redirecionamento falhou?): {e}")
+        print(f"[Notes] Erro na validação final: {e}")
 
 
 def edit_existing_note(driver, data):
@@ -138,42 +157,48 @@ def edit_existing_note(driver, data):
     go_to_notes(driver)
 
     try:
-        driver.find_element(
-            By.XPATH,
-            f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{notebook_name}']]",
+        wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{notebook_name}']]",
+            ),
         ).click()
-        wait()
+        wait(1)
 
-        driver.find_element(By.XPATH, f"//h3[text()='{original_title}']").click()
-        wait()
+        wait_for_clickable(
+            driver, (By.XPATH, f"//h3[text()='{original_title}']")
+        ).click()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao localizar a nota para edição: {e}")
         return
 
     try:
-        title_input = driver.find_element(
-            By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]"
+        title_input = wait_for_element(
+            driver, (By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]")
         )
         title_input.clear()
         title_input.send_keys(new_title)
-        wait()
+        wait(0.5)
     except Exception as e:
         print(f"[Notes] Erro ao editar título: {e}")
         return
 
     try:
-        content_area = driver.find_element(
-            By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']"
+        content_area = wait_for_element(
+            driver, (By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']")
         )
         slow_type(content_area, content_addition)
-        wait()
     except Exception as e:
         print(f"[Notes] Erro ao editar conteúdo: {e}")
         return
 
     try:
-        driver.find_element(By.XPATH, "//button[contains(., 'Salvar')]").click()
-        wait()
+        wait_for_clickable(
+            driver, (By.XPATH, "//button[contains(., 'Salvar')]")
+        ).click()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao salvar: {e}")
         return
@@ -187,39 +212,45 @@ def move_note(driver, data):
     go_to_notes(driver)
 
     try:
-        driver.find_element(
-            By.XPATH,
-            f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{source_notebook}']]",
+        wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{source_notebook}']]",
+            ),
         ).click()
-        wait()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao acessar caderno de origem: {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH, f"//div[h3[text()='{note_title}']]//button"
+        wait_for_clickable(
+            driver, (By.XPATH, f"//div[h3[text()='{note_title}']]//button")
         ).click()
-        wait()
+        wait(0.5)
     except Exception as e:
         print(f"[Notes] Erro ao clicar no menu da nota: {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH, "//div[@role='menuitem'][contains(., 'Mover para...')]"
+        wait_for_clickable(
+            driver, (By.XPATH, "//div[@role='menuitem'][contains(., 'Mover para...')]")
         ).click()
-        wait()
+        wait(0.5)
 
-        driver.find_element(
-            By.XPATH, f"//div[@role='menuitem'][contains(., '{target_notebook}')]"
+        wait_for_clickable(
+            driver,
+            (By.XPATH, f"//div[@role='menuitem'][contains(., '{target_notebook}')]"),
         ).click()
-        wait()
-        time.sleep(1)
+
+        # Espera o modal fechar e o item sumir da lista atual
+        wait_for_overlay_gone(driver)
+        wait(1)
+
     except Exception as e:
         print(f"[Notes] Erro ao selecionar destino no menu: {e}")
         return
-    wait()
 
 
 def favorite_note(driver, data):
@@ -229,22 +260,27 @@ def favorite_note(driver, data):
     go_to_notes(driver)
 
     try:
-        driver.find_element(
-            By.XPATH,
-            f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{notebook_name}']]",
+        wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                f"//div[contains(@class, 'hidden lg:flex')]//button[.//span[normalize-space()='{notebook_name}']]",
+            ),
         ).click()
-        wait()
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao acessar caderno: {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH,
-            f"//h3[contains(text(), '{note_title}')]/ancestor::div[contains(@class, 'cursor-pointer')]/preceding-sibling::button",
+        wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                f"//h3[contains(text(), '{note_title}')]/ancestor::div[contains(@class, 'cursor-pointer')]/preceding-sibling::button",
+            ),
         ).click()
-        wait()
-        time.sleep(1)
+        wait(1)
     except Exception as e:
         print(f"[Notes] Erro ao clicar na estrela de favorito: {e}")
 
@@ -255,48 +291,57 @@ def delete_draft_note(driver, data):
     go_to_notes(driver)
 
     try:
-        driver.find_element(By.XPATH, "//button[contains(., 'Nova Nota')]").click()
-        wait()
-
-        driver.find_element(
-            By.XPATH, "//div[contains(text(), 'Criar nota do zero')]"
+        wait_for_clickable(
+            driver, (By.XPATH, "//button[contains(., 'Nova Nota')]")
         ).click()
-        wait()
+        wait(0.5)
 
-        title_input = driver.find_element(
-            By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]"
+        wait_for_clickable(
+            driver, (By.XPATH, "//div[contains(text(), 'Criar nota do zero')]")
+        ).click()
+        wait(1)
+
+        title_input = wait_for_element(
+            driver, (By.XPATH, "//input[contains(@class, 'text-lg font-semibold')]")
         )
         title_input.clear()
         title_input.send_keys(note_data["title"])
-        wait()
+        wait(0.5)
 
-        content_area = driver.find_element(
-            By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']"
+        content_area = wait_for_element(
+            driver, (By.XPATH, "//textarea[@placeholder='Comece a escrever aqui...']")
         )
         slow_type(content_area, note_data["content"])
-        wait()
 
-        driver.find_element(By.XPATH, "//button[contains(., 'Salvar')]").click()
-        wait()
+        wait_for_clickable(
+            driver, (By.XPATH, "//button[contains(., 'Salvar')]")
+        ).click()
+        wait(2)
     except Exception as e:
         print(f"[Notes] Erro na preparação (criação da nota): {e}")
         return
 
     try:
-        driver.find_element(
-            By.XPATH, f"//div[h3[text()='{note_data['title']}']]//button"
+        wait_for_clickable(
+            driver, (By.XPATH, f"//div[h3[text()='{note_data['title']}']]//button")
         ).click()
-        wait()
+        wait(0.5)
 
-        driver.find_element(
-            By.XPATH, "//div[@role='menuitem'][contains(., 'Apagar Nota')]"
+        wait_for_clickable(
+            driver, (By.XPATH, "//div[@role='menuitem'][contains(., 'Apagar Nota')]")
         ).click()
-        wait()
+        wait(1)  # Espera modal de confirmação
 
-        driver.find_element(
-            By.XPATH,
-            "//button[contains(@class, 'bg-destructive') and contains(., 'Apagar')]",
+        wait_for_clickable(
+            driver,
+            (
+                By.XPATH,
+                "//button[contains(@class, 'bg-destructive') and contains(., 'Apagar')]",
+            ),
         ).click()
-        wait()
+
+        wait_for_overlay_gone(driver)
+        wait(1)
+
     except Exception as e:
         print(f"[Notes] Erro durante a exclusão: {e}")

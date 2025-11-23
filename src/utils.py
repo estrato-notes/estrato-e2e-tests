@@ -1,17 +1,83 @@
 import time
 
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-
-from .config import DELAY_TIME
-
-
-def wait():
-    """Pausa a execução pelo tempo definido no arquivo de configuração."""
-    time.sleep(DELAY_TIME)
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
-def slow_type(element: WebElement, text: str, delay: float = 0.05):
-    """Digita o texto caractere por caractere com um atraso."""
-    for character in text:
-        element.send_keys(character)
-        time.sleep(delay)
+def wait(seconds=2.0):
+    """Pausa forçada para esperar animações de UI."""
+    time.sleep(seconds)
+
+
+def wait_for_overlay_gone(driver, timeout=10):
+    """
+    Espera que o overlay (fundo escuro do modal) desapareça antes de prosseguir.
+    Essencial para evitar ElementClickInterceptedException.
+    """
+    try:
+        # Seletor genérico para overlays do Radix UI / Shadcn (fundo fixo)
+        overlay_xpath = (
+            "//div[contains(@data-state, 'open') and contains(@class, 'fixed inset-0')]"
+        )
+        WebDriverWait(driver, timeout).until(
+            EC.invisibility_of_element_located((By.XPATH, overlay_xpath))
+        )
+        # Pausa de segurança pós-animação
+        time.sleep(0.5)
+    except (TimeoutException, NoSuchElementException):
+        # Se não tiver overlay ou já tiver sumido, segue o fluxo
+        pass
+
+
+def wait_for_element(driver, locator, timeout=30):
+    """Espera visibilidade e adiciona pequena pausa para estabilidade."""
+    element = WebDriverWait(driver, timeout).until(
+        EC.visibility_of_element_located(locator)
+    )
+    return element
+
+
+def wait_for_clickable(driver, locator, timeout=30):
+    """
+    Espera o elemento ser clicável E garante que não há overlays bloqueando.
+    """
+    # 1. Garante que modais anteriores fecharam
+    wait_for_overlay_gone(driver)
+
+    # 2. Espera o elemento estar clicável
+    element = WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
+
+    # 3. Pausa tática para evitar cliques durante micro-animações de hover/focus
+    time.sleep(0.5)
+    return element
+
+
+def wait_for_url_contains(driver, snippet, timeout=30):
+    try:
+        WebDriverWait(driver, timeout).until(EC.url_contains(snippet))
+        return True
+    except TimeoutException:
+        return False
+
+
+def wait_for_invisibility(driver, locator, timeout=10):
+    """Espera um elemento desaparecer."""
+    try:
+        WebDriverWait(driver, timeout).until(
+            EC.invisibility_of_element_located(locator)
+        )
+    except Exception:
+        pass
+
+
+def slow_type(element: WebElement, text: str, delay: float = 0.1):
+    """Digita devagar. Se o elemento ficar 'stale' (velho), tenta digitar o resto."""
+    try:
+        for character in text:
+            element.send_keys(character)
+            time.sleep(delay)
+    except Exception as e:
+        print(f"[Utils] Erro ao digitar (pode ter perdido foco): {e}")
